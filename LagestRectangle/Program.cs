@@ -17,7 +17,7 @@ class Solution
 
     // Complete the largestRectangle function below.
 
-    // logic 1: (wrong)
+    // logic 1: (does not work)
     // if 1st element in array is the height, then width will be array.Length
     // if 2nd element in array is the height, then width will be array.Length - 1
     // so on and so forth, calcuate each h and w combination and then find the max
@@ -42,71 +42,45 @@ class Solution
     //         return allPossibleArea.Max(a => a);
     //     }        
 
-    // logic 2: (wrong)
+    // logic 2: (does not work)
     // start with 1st element, the width will be array.Length - 1
     // the height will be smallest value within the rest of elements
     // for array [6 2 5 4 5 1 6] 4(5) + 4 + 4(5) = 12. It does not take all the rest of elements.
     // need to find a stopping point.
 
     // logic 3: 
-    // based on the logic of 1 & 2, 
-    // start with 1st element, the width will be array.Length 
-    // the width will be array.Length - number of elements from stopping point to the end - position of the starting point
-    // the stopping point will be lowest value in the array
-    // also need to find the starting point. The lowest value after taking off stopping point.
-    // [6 2 5 4 5 1 6]
-
-    static long largestRectangle(int[] h)
-    {
-        var n = 7;
-        // Create an empty stack. The stack  
-        // holds indexes of hist[] array  
-        // The bars stored in stack are always  
-        // in increasing order of their heights.  
-        Stack<int> s = new Stack<int>();
-
-        int max_area = 0; // Initialize max area 
-        int tp; // To store top of stack 
-        int area_with_top; // To store area with top  
-                           // bar as the smallest bar 
-
-        // Run through all bars of 
-        // given histogram  
-        int i = 0;
-        while (i < n)
+    // use each element in array as base
+    // spread to the left side of base
+    // spread to the right side of base
+    // height is going to one of the element in the array
+    static long largestRectangle(int[] h) {
+        var n = h.Length;
+        var LargestArea = 0L;
+        for (var i = 0; i < n; i++)
         {
-            // If this bar is higher than the  
-            // bar on top stack, push it to stack  
-            if (s.Count == 0 || h[s.Peek()] <= h[i])
+            var width = 1;
+            for (var front = i - 1; front >= 0; front--) //向前扩增
             {
-                s.Push(i++);
+                if (h[front] >= h[i])
+                    width++;
+                else
+                    break;
+            }
+            for (var back = i + 1; back < n; back++) //向后扩增
+            {
+                if (h[back] >= h[i])
+                    width++;
+                else
+                    break;
             }
 
-            // If this bar is lower than top of stack, 
-            // then calculate area of rectangle with  
-            // stack top as the smallest (or minimum   
-            // height) bar. 'i' is 'right index' for  
-            // the top and element before top in stack 
-            // is 'left index'  
-            else
-            {
-                tp = s.Peek(); // store the top index 
-                s.Pop(); // pop the top 
-
-                // Calculate the area with hist[tp] 
-                // stack as smallest bar  
-                area_with_top = h[tp] *
-                               (s.Count == 0 ? i : i - s.Peek() - 1);
-
-                // update max area, if needed  
-                if (max_area < area_with_top)
-                {
-                    max_area = area_with_top;
-                }
-            }
+            var currentArea = width * h[i];
+            if (LargestArea < currentArea)
+                LargestArea = currentArea;
         }
-        return max_area;
+        return LargestArea;
     }
+
 
     static void Main(string[] args)
     {
